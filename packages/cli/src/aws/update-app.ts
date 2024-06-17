@@ -13,6 +13,7 @@ export interface UpdateAppOptions {
   file?: string;
   toVersion?: string;
   dryrun?: boolean;
+  extractedTarDir?: string;
 }
 
 /**
@@ -36,8 +37,12 @@ export async function updateAppCommand(tag: string, options: UpdateAppOptions): 
     throw new Error(`App bucket not found for stack ${tag}`);
   }
 
-  const version = options?.toVersion ?? 'latest';
-  const tmpDir = await downloadNpmPackage('@medplum/app', version);
+  if (!options?.extractedTarDir) {
+    const version = options?.toVersion ?? 'latest';
+    var tmpDir = await downloadNpmPackage('@medplum/app', version);
+  } else {
+    var tmpDir = options.extractedTarDir;
+  }
 
   // Replace variables in the app
   replaceVariables(tmpDir, {
